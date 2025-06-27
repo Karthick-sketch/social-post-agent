@@ -1,13 +1,16 @@
 # main.py  – simple CLI demo
 import os
-from agent.llm_provider import OpenAIProvider, DeepSeekProvider
+from agent.llm_provider import OpenAIProvider, DeepSeekProvider, QwenProvider
 from agent.post_agent import SocialPostAgent
 
 
 def main():
-    llm = (DeepSeekProvider()
-           if os.getenv("LLM_PROVIDER") == "deepseek"
-           else OpenAIProvider())
+    if os.getenv("LLM_PROVIDER") == "deepseek":
+        llm = DeepSeekProvider()
+    elif os.getenv("LLM_PROVIDER") == "openai":
+        llm = OpenAIProvider()
+    else:
+        llm = QwenProvider()
 
     agent = SocialPostAgent(llm)
 

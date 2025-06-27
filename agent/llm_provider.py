@@ -42,7 +42,20 @@ class DeepSeekProvider(LLMProvider):
         return resp.json()["choices"][0]["message"]["content"]
 
 
+class QwenProvider(LLMProvider):
+    def __init__(self, model: str = "qwen/qwen3-4b"):
+        self.model = model
+        self.url = "http://localhost:1234/v1/chat/completions"
+
+    def chat(self, messages, **kwargs):
+        payload = {"model": self.model, "messages": messages, **kwargs}
+        headers = {"Content-Type": "application/json"}
+        resp = requests.post(self.url, json=payload, headers=headers, timeout=120)
+        resp.raise_for_status()
+        return resp.json()["choices"][0]["message"]["content"]
+
+
 # --- runtime switch ---
 provider_name = os.getenv("LLM_PROVIDER", "openai")
-provider_cls = {"openai": OpenAIProvider, "deepseek": DeepSeekProvider}[provider_name]
+provider_cls = {"openai": OpenAIProvider, "deepseek": DeepSeekProvider, "qwen": QwenProvider}[provider_name]
 llm = provider_cls()
