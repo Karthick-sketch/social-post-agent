@@ -4,6 +4,7 @@ from agent.prompts import BASE_SYSTEM, IMAGE_PROMPT
 from agent.scheduler import BufferScheduler
 from agent.db import DB
 from agent.image_provider import UnsplashProvider
+from model.post_model import Platform
 
 
 class Status(Enum):
@@ -20,8 +21,9 @@ class SocialPostAgent:
         self.db = db or DB("posts.sqlite")
 
     # 1. Generate captions + hashtags
-    def create_post(self, brief: str, brand="ACME", tone="friendly"):
-        system = BASE_SYSTEM.format(brand=brand, tone=tone)
+    def create_post(self, brief: str, platforms: list[Platform], brand="ACME", tone="friendly"):
+        platforms_str = ", ".join(p.value for p in platforms)
+        system = BASE_SYSTEM.format(brand=brand, tone=tone, platforms=platforms_str)
         messages = [
             {"role": "system", "content": system},
             {"role": "user", "content": brief},
@@ -44,9 +46,9 @@ class SocialPostAgent:
         return self.image_provider.search(query)
 
     # 3. Schedule after human approval
-    def schedule(self, record_id: int, when: str):
+    def schedule(self, record_id: int, when: str, platforms: list[Platform]):
         post = self.db.get(record_id)
-        self.scheduler.schedule(post, when)
+        self.scheduler.schedule(post, when, platforms)
         self.db.update_status(record_id, Status.SCHEDULED.name)
 
     def __remove_obstacles(self, content: str):

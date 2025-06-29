@@ -1,31 +1,16 @@
-# main.py  – simple CLI demo
-import os
-from agent.llm_provider import OpenAIProvider, DeepSeekProvider, QwenProvider
-from agent.post_agent import SocialPostAgent
+from fastapi import FastAPI
+from model.post_model import GeneratePostModel, ScheduleModel
+import service
+
+app = FastAPI()
 
 
-def main():
-    if os.getenv("LLM_PROVIDER") == "deepseek":
-        llm = DeepSeekProvider()
-    elif os.getenv("LLM_PROVIDER") == "openai":
-        llm = OpenAIProvider()
-    else:
-        llm = QwenProvider()
-
-    agent = SocialPostAgent(llm)
-
-    brief = input("Describe the announcement in one sentence:\n> ")
-    id_, draft = agent.create_post(brief)
-    print("\n----- DRAFT -----\n", draft, "\n-----------------")
-
-    choice = input("Approve? (y/n) ")
-    if choice.lower().startswith("y"):
-        when = input("Schedule (ISO datetime, e.g. 2025-07-01T10:00): ")
-        agent.schedule(id_, when)
-        print("✅  Scheduled!")
-    else:
-        print("❌  Discarded.")
+@app.post("/generate-post")
+async def generate_post(model: GeneratePostModel):
+    print(model)
+    return service.generate_post(model.brief, model.llm_provider, model.platforms)
 
 
-if __name__ == "__main__":
-    main()
+@app.post("/schedule")
+async def schedule_post(model: ScheduleModel):
+    service.schedule_post(model.post_id, model.when, model.llm_provider, model.platforms)
