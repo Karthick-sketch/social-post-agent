@@ -9,12 +9,13 @@ class Platform(Enum):
 
 
 class PostModel(BaseModel):
-    llm_provider: str
     platforms: list[Platform]
 
 
 class GeneratePostModel(PostModel):
     brief: str
+    brand: str
+    tone: str
 
 
 class ScheduleModel(PostModel):

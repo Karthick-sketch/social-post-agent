@@ -10,17 +10,17 @@ class UnsplashProvider(ImageProvider):
     def __init__(self):
         self.access_key = os.getenv("ACCESS_KEY")
 
-    def search(self, query: str, page=1, per_page=5) -> list[str]:
+    def search(self, query: str, page=1, per_page=5) -> list[dict]:
         url = self.__get_url(query, page, per_page)
         headers = {"Authorization": f"Client-ID {self.access_key}"}
         response = requests.get(url, headers=headers)
         body = response.json()
         results = body["results"]
-        image_urls = []
+        images = []
         for result in results:
-            image_urls.append(result["urls"]["raw"])
+            images.append({"id": result["id"], "url": result["urls"]["raw"]})
 
-        return image_urls
+        return images
 
     def __get_url(self, query: str, page: int, per_page: int):
         return f"https://api.unsplash.com/search/photos?query={query}&page={page}&per_page={per_page}"

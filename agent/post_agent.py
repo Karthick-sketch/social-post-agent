@@ -21,7 +21,9 @@ class SocialPostAgent:
         self.db = db or DB("posts.sqlite")
 
     # 1. Generate captions + hashtags
-    def create_post(self, brief: str, platforms: list[Platform], brand="ACME", tone="friendly"):
+    def create_post(
+        self, brief: str, platforms: list[Platform], brand: str, tone="friendly"
+    ):
         platforms_str = ", ".join(p.value for p in platforms)
         system = BASE_SYSTEM.format(brand=brand, tone=tone, platforms=platforms_str)
         messages = [
@@ -35,7 +37,7 @@ class SocialPostAgent:
         return record_id, content
 
     # 2. Suggest Unsplash image
-    def suggest_image(self, post_text: str):
+    def suggest_image(self, post_text: str, page: int):
         print("Generating Post images...")
         query = self.llm.chat(
             [{"role": "user", "content": IMAGE_PROMPT.format(post_text=post_text)}],
@@ -43,7 +45,7 @@ class SocialPostAgent:
             max_tokens=20,
         )
         query = self.__remove_obstacles(query)
-        return self.image_provider.search(query)
+        return self.image_provider.search(query, page)
 
     # 3. Schedule after human approval
     def schedule(self, record_id: int, when: str, platforms: list[Platform]):
