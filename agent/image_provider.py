@@ -3,7 +3,7 @@ import os, abc, requests
 
 class ImageProvider(abc.ABC):
     @abc.abstractmethod
-    def search(self, query: str, page: int, per_page: int) -> list[str]: ...
+    def search(self, query: str, page: int, per_page: int) -> list[dict]: ...
 
 
 class UnsplashProvider(ImageProvider):

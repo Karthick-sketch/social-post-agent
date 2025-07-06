@@ -5,16 +5,16 @@ from model.post_model import Platform
 
 
 class SocialPostAgentService:
-    def __init__(self, llm_provider: str):
-        self.agent = self.__get_agent(llm_provider)
+    def __init__(self, llm_provider: str, model: str):
+        self.agent = self.__get_agent(llm_provider, model)
 
-    def __get_agent(self, llm_provider: str):
+    def __get_agent(self, llm_provider: str, model: str):
         if llm_provider == "deepseek":
-            llm = DeepSeekProvider()
+            llm = DeepSeekProvider(model=model)
         elif llm_provider == "openai":
-            llm = OpenAIProvider()
+            llm = OpenAIProvider(model=model)
         else:
-            llm = QwenProvider()
+            llm = QwenProvider(model=model)
         return SocialPostAgent(llm)
 
     def generate_post(

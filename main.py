@@ -3,8 +3,11 @@ from fastapi import FastAPI
 from model.post_model import GeneratePostModel, ScheduleModel
 from social_post_agent_service import SocialPostAgentService
 
+LLM_PROVIDER = os.getenv("LLM_PROVIDER", "deepseek")
+MODEL = os.getenv("MODEL", "deepseek/deepseek-r1-0528:free")
+
 app = FastAPI()
-service = SocialPostAgentService(os.getenv("LLM_PROVIDER"))
+service = SocialPostAgentService(LLM_PROVIDER, MODEL)
 
 
 @app.post("/generate-post")

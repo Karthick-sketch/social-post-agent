@@ -16,20 +16,16 @@ class OpenAIProvider(LLMProvider):
 
     def chat(self, messages, **kwargs):
         resp = self.client.chat.completions.create(
-            model=self.model, messages=messages, **kwargs
-        )
+            model=self.model, messages=messages, **kwargs  # type: ignore
+        )  # type: ignore
         return resp.choices[0].message.content
 
 
 class DeepSeekProvider(LLMProvider):
-    """
-    Works with free-tier keys from https://api.deepseek.com
-    """
-
     def __init__(self, model: str = "deepseek-chat"):
         self.api_key = os.getenv("DEEPSEEK_API_KEY")
         self.model = model
-        self.url = "https://api.deepseek.com/chat/completions"
+        self.url = "https://openrouter.ai/api/v1/chat/completions"
 
     def chat(self, messages, **kwargs):
         payload = {"model": self.model, "messages": messages, **kwargs}
@@ -57,5 +53,9 @@ class QwenProvider(LLMProvider):
 
 # --- runtime switch ---
 provider_name = os.getenv("LLM_PROVIDER", "openai")
-provider_cls = {"openai": OpenAIProvider, "deepseek": DeepSeekProvider, "qwen": QwenProvider}[provider_name]
+provider_cls = {
+    "openai": OpenAIProvider,
+    "deepseek": DeepSeekProvider,
+    "qwen": QwenProvider,
+}[provider_name]
 llm = provider_cls()
