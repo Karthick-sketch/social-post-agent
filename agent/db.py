@@ -8,6 +8,7 @@ posts(
     id         INTEGER PRIMARY KEY AUTOINCREMENT,
     brief      TEXT    NOT NULL,   -- 1-sentence input from marketer
     content    TEXT    NOT NULL,   -- JSON blob with captions & hashtags
+    images     TEXT    NOT NULL,   -- JSON array of image URLs
     status     TEXT    NOT NULL,   -- DRAFT | APPROVED | SCHEDULED
     created_at TEXT    NOT NULL,   -- ISO-8601 UTC timestamp
     updated_at TEXT    NOT NULL    -- ISO-8601 UTC timestamp
@@ -34,7 +35,7 @@ class DB:
     # ------------------------------------------------------------------
     # Public API
     # ------------------------------------------------------------------
-    def insert_post(self, brief: str, content: str, status: str) -> int:
+    def insert_post(self, brief: str, content: str, status: str) -> int | None:
         """Insert a new record and return its auto-increment id."""
         ts = self._now()
         cur = self.conn.execute(
@@ -43,7 +44,7 @@ class DB:
             (brief, content, status, ts, ts),
         )
         self.conn.commit()
-        return int(cur.lastrowid)
+        return cur.lastrowid
 
     def get(self, post_id: int) -> Dict[str, Any]:
         row = self.conn.execute(
@@ -88,6 +89,7 @@ class DB:
                 id          INTEGER PRIMARY KEY AUTOINCREMENT,
                 brief       TEXT    NOT NULL,
                 content     TEXT    NOT NULL,
+                images      TEXT    NOT NULL,
                 status      TEXT    NOT NULL,
                 created_at  TEXT    NOT NULL,
                 updated_at  TEXT    NOT NULL

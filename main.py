@@ -1,5 +1,8 @@
 import os
+
 from fastapi import FastAPI
+from fastapi.middleware.cors import CORSMiddleware
+
 from model.post_model import GeneratePostModel, ScheduleModel
 from social_post_agent_service import SocialPostAgentService
 
@@ -9,17 +12,27 @@ MODEL = os.getenv("MODEL", "deepseek/deepseek-r1-0528:free")
 app = FastAPI()
 service = SocialPostAgentService(LLM_PROVIDER, MODEL)
 
+origins = ["http://localhost:4200"]
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=origins,
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+
 
 @app.post("/generate-post")
-async def generate_post(model: GeneratePostModel):
+async def generate_post(model: GeneratePostModel) -> dict:
     return service.generate_post(model.brief, model.platforms, model.brand, model.tone)
 
 
 @app.get("/suggest-images")
-async def suggest_images(query: str, page: int):
-    return service.suggest_images(query, page)
+async def suggest_images(id_: int, page: int) -> dict:
+    return service.suggest_images(id_, page)
 
 
 @app.post("/schedule")
-async def schedule_post(model: ScheduleModel):
-    service.schedule_post(model.post_id, model.when, model.platforms)
+async def schedule_post(model: ScheduleModel) -> bool:
+    return service.schedule_post(model.post_id, model.when, model.platforms)
