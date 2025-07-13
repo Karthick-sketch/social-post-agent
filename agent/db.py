@@ -5,13 +5,14 @@ Tiny SQLite helper for storing social-post records.
 Schema
 ------
 posts(
-    id         INTEGER PRIMARY KEY AUTOINCREMENT,
-    brief      TEXT    NOT NULL,   -- 1-sentence input from marketer
-    content    TEXT    NOT NULL,   -- JSON blob with captions & hashtags
-    images     TEXT    NOT NULL,   -- JSON array of image URLs
-    status     TEXT    NOT NULL,   -- DRAFT | APPROVED | SCHEDULED
-    created_at TEXT    NOT NULL,   -- ISO-8601 UTC timestamp
-    updated_at TEXT    NOT NULL    -- ISO-8601 UTC timestamp
+    id              INTEGER PRIMARY KEY AUTOINCREMENT,
+    brief           TEXT    NOT NULL,   -- 1-sentence input from marketer
+    content         TEXT    NOT NULL,   -- JSON blob with captions & hashtags
+    user_content    TEXT    NOT NULL,   -- human-edited content
+    images          TEXT    NOT NULL,   -- JSON array of image URLs
+    status          TEXT    NOT NULL,   -- DRAFT | APPROVED | SCHEDULED
+    created_at      TEXT    NOT NULL,   -- ISO-8601 UTC timestamp
+    updated_at      TEXT    NOT NULL    -- ISO-8601 UTC timestamp
 )
 """
 
@@ -21,7 +22,6 @@ import sqlite3
 from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any, Dict, List, Optional
-
 
 ISO = "%Y-%m-%dT%H:%M:%SZ"  # always store UTC “Zulu” time
 
@@ -54,6 +54,14 @@ class DB:
             raise ValueError(f"Post id {post_id} not found")
         return dict(row)
 
+    def update_user_content(self, post_id: int, user_content: str) -> None:
+        ts = self._now()
+        self.conn.execute(
+            "UPDATE posts SET user_content = ?, updated_at = ? WHERE id = ?",
+            (user_content, ts, post_id),
+        )
+        self.conn.commit()
+
     def update_status(self, post_id: int, status: str) -> None:
         ts = self._now()
         self.conn.execute(
@@ -85,14 +93,16 @@ class DB:
     def _ensure_schema(self) -> None:
         self.conn.execute(
             """
-            CREATE TABLE IF NOT EXISTS posts (
-                id          INTEGER PRIMARY KEY AUTOINCREMENT,
-                brief       TEXT    NOT NULL,
-                content     TEXT    NOT NULL,
-                images      TEXT    NOT NULL,
-                status      TEXT    NOT NULL,
-                created_at  TEXT    NOT NULL,
-                updated_at  TEXT    NOT NULL
+            CREATE TABLE IF NOT EXISTS posts
+            (
+                id           INTEGER PRIMARY KEY AUTOINCREMENT,
+                brief        TEXT NOT NULL,
+                content      TEXT NOT NULL,
+                user_content TEXT,
+                images       TEXT,
+                status       TEXT NOT NULL,
+                created_at   TEXT NOT NULL,
+                updated_at   TEXT NOT NULL
             )
             """
         )

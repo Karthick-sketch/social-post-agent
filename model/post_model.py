@@ -9,15 +9,20 @@ class Platform(Enum):
 
 
 class PostModel(BaseModel):
-    platforms: list[Platform]
+    id_: int
+    linkedin: str
+    instagram: str
+    twitter: str
 
 
-class GeneratePostModel(PostModel):
+class GeneratePostModel(BaseModel):
     brief: str
     brand: str
     tone: str
+    platforms: list[Platform]
 
 
-class ScheduleModel(PostModel):
+class ScheduleModel(BaseModel):
     post_id: int
     when: str
+    platforms: list[Platform]

@@ -3,7 +3,7 @@ import os
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
-from model.post_model import GeneratePostModel, ScheduleModel
+from model.post_model import GeneratePostModel, PostModel, ScheduleModel
 from social_post_agent_service import SocialPostAgentService
 
 LLM_PROVIDER = os.getenv("LLM_PROVIDER", "deepseek")
@@ -24,8 +24,13 @@ app.add_middleware(
 
 
 @app.post("/generate-post")
-async def generate_post(model: GeneratePostModel) -> dict:
+async def generate_post(model: GeneratePostModel) -> PostModel:
     return service.generate_post(model.brief, model.platforms, model.brand, model.tone)
+
+
+@app.put("/save-post")
+async def save_post(model: PostModel) -> None:
+    service.save_post(model)
 
 
 @app.get("/suggest-images")

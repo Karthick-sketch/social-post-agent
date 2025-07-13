@@ -4,7 +4,7 @@ from agent.prompts import BASE_SYSTEM, IMAGE_PROMPT
 from agent.scheduler import AryshareScheduler
 from agent.db import DB
 from agent.image_provider import UnsplashProvider
-from model.post_model import Platform
+from model.post_model import Platform, PostModel
 
 
 class Status(Enum):
@@ -22,8 +22,8 @@ class SocialPostAgent:
 
     # 1. Generate captions + hashtags
     def create_post(
-        self, brief: str, platforms: list[Platform], brand: str, tone="friendly"
-    ):
+            self, brief: str, platforms: list[Platform], brand: str, tone="friendly"
+    ) -> tuple[int, str]:
         platforms_str = ", ".join(p.value for p in platforms)
         system = BASE_SYSTEM.format(brand=brand, tone=tone, platforms=platforms_str)
         messages = [
@@ -34,6 +34,20 @@ class SocialPostAgent:
         content = self.llm.chat(messages, temperature=0.7)
         record_id = self.db.insert_post(brief, content, Status.DRAFT.name)
         return record_id, content
+
+
+    def save_post(self, model: PostModel) -> None:
+        print("ID: " + str(model.id_))
+        user_content = (
+                '{"linkedin": "'
+                + model.linkedin
+                + '", "instagram": "'
+                + model.instagram
+                + '", "twitter": "'
+                + model.twitter
+                + '"}'
+        )
+        self.db.update_user_content(model.id_, user_content)
 
     # 2. Suggest Unsplash image
     def suggest_image(self, id_: int, page: int) -> list[dict]:

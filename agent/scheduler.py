@@ -1,5 +1,5 @@
 # agent/scheduler.py  – mock Buffer wrapper
-import os, requests
+# import os, requests
 from abc import ABC, abstractmethod
 from ast import literal_eval
 from model.post_model import Platform

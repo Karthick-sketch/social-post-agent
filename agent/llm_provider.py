@@ -9,16 +9,10 @@ class LLMProvider(abc.ABC):
 
 class OpenAIProvider(LLMProvider):
     def __init__(self, model: str = "gpt-4o-mini"):
-        from openai import OpenAI  # official SDK
-
-        self.client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
-        self.model = model
+        pass
 
     def chat(self, messages, **kwargs):
-        resp = self.client.chat.completions.create(
-            model=self.model, messages=messages, **kwargs  # type: ignore
-        )  # type: ignore
-        return resp.choices[0].message.content
+        pass
 
 
 class DeepSeekProvider(LLMProvider):
