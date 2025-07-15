@@ -20,7 +20,7 @@ class UnsplashProvider(ImageProvider):
         results = body["results"]
         images = []
         for result in results:
-            images.append(ImageModel(result["id"], result["urls"]["raw"]))
+            images.append(ImageModel(id_=result["id"], url=result["urls"]["raw"]))
 
         return images
 

@@ -5,7 +5,7 @@ from agent.scheduler import AryshareScheduler
 from agent.db import DB
 from agent.image_provider import UnsplashProvider
 from model.image_model import ImageModel
-from model.post_model import Platform, PostModel
+from model.post_model import Platform, PostModel, ScheduleModel
 
 
 class Status(Enum):
@@ -33,7 +33,7 @@ class SocialPostAgent:
         ]
         print("Generating Post text...")
         content = self.llm.chat(messages, temperature=0.7)
-        record_id = self.db.insert_post(brief, content, Status.DRAFT.name)
+        record_id = self.db.insert_post(brief, content, platforms_str, Status.DRAFT.name)
         return record_id, content
 
     def save_post(self, model: PostModel) -> None:
@@ -46,14 +46,16 @@ class SocialPostAgent:
                 + model.twitter
                 + '"}'
         )
+        user_content = user_content.replace("\n", "\\n")
         self.db.update_user_content(model.id_, user_content)
 
     def save_post_images(self, post_id: int, model: list[ImageModel]) -> None:
-        images = '['
+        images = []
         for image in model:
-            images += f'{{"id_": {image.id_}, "url": "{image.url}", "selected": {image.selected}}}'
-        images = f'{images}]'
-        self.db.update_images(post_id, images)
+            images.append(
+                f'{{"id_": {image.id_}, "url": "{image.url}", "selected": {"true" if image.selected else "false"}}}')
+        images_str = f'[{",".join(images)}]'
+        self.db.update_images(post_id, images_str)
 
     # 2. Suggest Unsplash image
     def suggest_image(self, post_id: int, page: int) -> list[dict]:
@@ -71,9 +73,25 @@ class SocialPostAgent:
         )
         return self.image_provider.search(query, page)
 
+    def selected_platforms(self, post_id: int) -> list[Platform]:
+        post = self.db.get(post_id)
+        platforms = self.__get_platforms(post["platforms"])
+        return platforms
+
     # 3. Schedule after human approval
-    def schedule(self, record_id: int, when: str, platforms: list[Platform]) -> bool:
-        post = self.db.get(record_id)
+    def schedule_post(self, post_id: int, model: ScheduleModel) -> bool:
+        post = self.db.get(post_id)
+        when = f'{model.date}T{model.time}'
+        platforms = self.__get_platforms(post["platforms"])
         self.scheduler.schedule(post, when, platforms)
-        self.db.update_status(record_id, Status.SCHEDULED.name)
+        self.db.update_schedule(post_id, when)
+        self.db.update_status(post_id, Status.SCHEDULED.name)
         return True
+
+    @staticmethod
+    def __get_platforms(platforms_str: str) -> list[Platform]:
+        platforms_str = platforms_str.split(",")
+        platforms = []
+        for p in platforms_str:
+            platforms.append(Platform[p.strip().upper()])
+        return platforms

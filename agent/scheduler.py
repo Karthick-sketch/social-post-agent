@@ -1,11 +1,14 @@
 # agent/scheduler.py  – mock Buffer wrapper
 # import os, requests
+import json
 from abc import ABC, abstractmethod
-from ast import literal_eval
 from model.post_model import Platform
 
 
 class Scheduler(ABC):
+    @abstractmethod
+    def post(self, post: dict, platforms: list[Platform]): ...
+
     @abstractmethod
     def schedule(self, post: dict, when: str, platforms: list[Platform]): ...
 
@@ -14,9 +17,12 @@ class AryshareScheduler(Scheduler):
     def __init__(self):
         self.url = "https://api.ayrshare.com/api/post"
 
+    def post(self, post: dict, platforms: list[Platform]):
+        pass
+
     def schedule(self, post: dict, when: str, platforms: list[Platform]):
-        content = literal_eval(post["content"])
-        images = literal_eval(post["images"])
+        content = json.loads(post["user_content"])
+        images = json.loads(post["images"])
         print(content)
         print(images)
         # headers = {

@@ -8,8 +8,10 @@ posts(
     id              INTEGER PRIMARY KEY AUTOINCREMENT,
     brief           TEXT    NOT NULL,   -- 1-sentence input from marketer
     content         TEXT    NOT NULL,   -- JSON blob with captions & hashtags
+    platforms       TEXT    NOT NULL,   -- JSON blob with platforms
     user_content    TEXT    NOT NULL,   -- human-edited content
-    images          TEXT,   -- JSON array of image URLs
+    images          TEXT,               -- JSON array of image URLs
+    schedule        TEXT,               -- ISO-8601 UTC timestamp
     status          TEXT    NOT NULL,   -- DRAFT | APPROVED | SCHEDULED
     created_at      TEXT    NOT NULL,   -- ISO-8601 UTC timestamp
     updated_at      TEXT    NOT NULL    -- ISO-8601 UTC timestamp
@@ -35,20 +37,20 @@ class DB:
     # ------------------------------------------------------------------
     # Public API
     # ------------------------------------------------------------------
-    def insert_post(self, brief: str, content: str, status: str) -> int | None:
+    def insert_post(self, brief: str, content: str, platforms: str, status: str) -> int | None:
         """Insert a new record and return its auto-increment id."""
         ts = self._now()
         cur = self.conn.execute(
-            "INSERT INTO posts (brief, content, status, created_at, updated_at) "
-            "VALUES (?, ?, ?, ?, ?)",
-            (brief, content, status, ts, ts),
+            "INSERT INTO posts (brief, content, platforms, status, created_at, updated_at) "
+            "VALUES (?, ?, ?, ?, ?, ?)",
+            (brief, content, platforms, status, ts, ts),
         )
         self.conn.commit()
         return cur.lastrowid
 
     def get(self, post_id: int) -> Dict[str, Any]:
         row = self.conn.execute(
-            "SELECT * FROM posts WHERE id = ?", (post_id,)
+            "SELECT * FROM posts WHERE id = ?", (post_id)
         ).fetchone()
         if row is None:
             raise ValueError(f"Post id {post_id} not found")
@@ -67,6 +69,14 @@ class DB:
         self.conn.execute(
             "UPDATE posts SET images = ?, updated_at = ? WHERE id = ?",
             (images, ts, post_id),
+        )
+        self.conn.commit()
+
+    def update_schedule(self, post_id: int, when: str) -> None:
+        ts = self._now()
+        self.conn.execute(
+            "UPDATE posts SET schedule = ?, updated_at = ? WHERE id = ?",
+            (when, ts, post_id),
         )
         self.conn.commit()
 
@@ -106,8 +116,10 @@ class DB:
                 id           INTEGER PRIMARY KEY AUTOINCREMENT,
                 brief        TEXT NOT NULL,
                 content      TEXT NOT NULL,
-                user_content TEXT,
+                platforms    TEXT NOT NULL,
+                user_content TEXT NOT NULL,
                 images       TEXT,
+                schedule     TEXT,
                 status       TEXT NOT NULL,
                 created_at   TEXT NOT NULL,
                 updated_at   TEXT NOT NULL

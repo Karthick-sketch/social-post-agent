@@ -4,7 +4,7 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
 from model.image_model import ImageModel
-from model.post_model import GeneratePostModel, PostModel, ScheduleModel
+from model.post_model import GeneratePostModel, PostModel, ScheduleModel, Platform
 from social_post_agent_service import SocialPostAgentService
 
 LLM_PROVIDER = os.getenv("LLM_PROVIDER", "deepseek")
@@ -31,12 +31,7 @@ async def generate_post(model: GeneratePostModel) -> PostModel:
 
 @app.put("/save-post")
 async def save_post(model: PostModel) -> None:
-    (service.save_post(model))
-
-
-@app.put("/save-post-images/{post_id}")
-async def save_post_images(post_id: int, model: list[ImageModel]) -> None:
-    service.save_post_images(post_id, model)
+    service.save_post(model)
 
 
 @app.get("/suggest-images/{post_id}")
@@ -44,6 +39,16 @@ async def suggest_images(post_id: int, page: int = 1) -> list[dict]:
     return service.suggest_images(post_id, page)
 
 
-@app.post("/schedule")
-async def schedule_post(model: ScheduleModel) -> bool:
-    return service.schedule_post(model.post_id, model.when, model.platforms)
+@app.put("/save-post-images/{post_id}")
+async def save_post_images(post_id: int, model: list[ImageModel]) -> None:
+    service.save_post_images(post_id, model)
+
+
+@app.get("/platforms/{post_id}")
+async def selected_platforms(post_id: int) -> list[Platform]:
+    return service.selected_platforms(post_id)
+
+
+@app.post("/schedule/{post_id}")
+async def schedule_post(post_id: int, model: ScheduleModel) -> bool:
+    return service.schedule_post(post_id, model)

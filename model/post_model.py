@@ -3,9 +3,9 @@ from enum import Enum
 
 
 class Platform(Enum):
-    LINKEDIN = "linkedin"
-    INSTAGRAM = "instagram"
-    TWITTER = "twitter"
+    LINKEDIN = "LinkedIn"
+    INSTAGRAM = "Instagram"
+    TWITTER = "Twitter"
 
 
 class PostModel(BaseModel):
@@ -23,6 +23,5 @@ class GeneratePostModel(BaseModel):
 
 
 class ScheduleModel(BaseModel):
-    post_id: int
-    when: str
-    platforms: list[Platform]
+    date: str
+    time: str

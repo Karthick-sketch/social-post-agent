@@ -3,7 +3,7 @@ import json
 from agent.llm_provider import OpenAIProvider, DeepSeekProvider
 from agent.post_agent import SocialPostAgent
 from model.image_model import ImageModel
-from model.post_model import Platform, PostModel
+from model.post_model import Platform, PostModel, ScheduleModel
 
 
 class SocialPostAgentService:
@@ -34,8 +34,11 @@ class SocialPostAgentService:
     def suggest_images(self, post_id: int, page: int) -> list[dict]:
         return self.agent.suggest_image(post_id, page)
 
-    def schedule_post(self, post_id: int, when: str, platforms: list[Platform]) -> bool:
-        return self.agent.schedule(post_id, when, platforms)
+    def selected_platforms(self, post_id: int) -> list[Platform]:
+        return self.agent.selected_platforms(post_id)
+
+    def schedule_post(self, post_id: int, model: ScheduleModel) -> bool:
+        return self.agent.schedule_post(post_id, model)
 
     @staticmethod
     def __convert_post(draft: str) -> dict:
