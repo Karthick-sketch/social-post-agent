@@ -3,6 +3,7 @@ import os
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
+from model.image_model import ImageModel
 from model.post_model import GeneratePostModel, PostModel, ScheduleModel
 from social_post_agent_service import SocialPostAgentService
 
@@ -30,12 +31,17 @@ async def generate_post(model: GeneratePostModel) -> PostModel:
 
 @app.put("/save-post")
 async def save_post(model: PostModel) -> None:
-    service.save_post(model)
+    (service.save_post(model))
 
 
-@app.get("/suggest-images")
-async def suggest_images(id_: int, page: int) -> dict:
-    return service.suggest_images(id_, page)
+@app.put("/save-post-images/{post_id}")
+async def save_post_images(post_id: int, model: list[ImageModel]) -> None:
+    service.save_post_images(post_id, model)
+
+
+@app.get("/suggest-images/{post_id}")
+async def suggest_images(post_id: int, page: int = 1) -> list[dict]:
+    return service.suggest_images(post_id, page)
 
 
 @app.post("/schedule")

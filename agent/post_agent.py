@@ -4,6 +4,7 @@ from agent.prompts import BASE_SYSTEM, IMAGE_PROMPT
 from agent.scheduler import AryshareScheduler
 from agent.db import DB
 from agent.image_provider import UnsplashProvider
+from model.image_model import ImageModel
 from model.post_model import Platform, PostModel
 
 
@@ -35,9 +36,7 @@ class SocialPostAgent:
         record_id = self.db.insert_post(brief, content, Status.DRAFT.name)
         return record_id, content
 
-
     def save_post(self, model: PostModel) -> None:
-        print("ID: " + str(model.id_))
         user_content = (
                 '{"linkedin": "'
                 + model.linkedin
@@ -49,10 +48,17 @@ class SocialPostAgent:
         )
         self.db.update_user_content(model.id_, user_content)
 
+    def save_post_images(self, post_id: int, model: list[ImageModel]) -> None:
+        images = '['
+        for image in model:
+            images += f'{{"id_": {image.id_}, "url": "{image.url}", "selected": {image.selected}}}'
+        images = f'{images}]'
+        self.db.update_images(post_id, images)
+
     # 2. Suggest Unsplash image
-    def suggest_image(self, id_: int, page: int) -> list[dict]:
+    def suggest_image(self, post_id: int, page: int) -> list[dict]:
         print("Generating Post images...")
-        post = self.db.get(id_)
+        post = self.db.get(post_id)
         query = self.llm.chat(
             [
                 {

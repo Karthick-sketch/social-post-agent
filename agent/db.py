@@ -9,7 +9,7 @@ posts(
     brief           TEXT    NOT NULL,   -- 1-sentence input from marketer
     content         TEXT    NOT NULL,   -- JSON blob with captions & hashtags
     user_content    TEXT    NOT NULL,   -- human-edited content
-    images          TEXT    NOT NULL,   -- JSON array of image URLs
+    images          TEXT,   -- JSON array of image URLs
     status          TEXT    NOT NULL,   -- DRAFT | APPROVED | SCHEDULED
     created_at      TEXT    NOT NULL,   -- ISO-8601 UTC timestamp
     updated_at      TEXT    NOT NULL    -- ISO-8601 UTC timestamp
@@ -59,6 +59,14 @@ class DB:
         self.conn.execute(
             "UPDATE posts SET user_content = ?, updated_at = ? WHERE id = ?",
             (user_content, ts, post_id),
+        )
+        self.conn.commit()
+
+    def update_images(self, post_id: int, images: str) -> None:
+        ts = self._now()
+        self.conn.execute(
+            "UPDATE posts SET images = ?, updated_at = ? WHERE id = ?",
+            (images, ts, post_id),
         )
         self.conn.commit()
 

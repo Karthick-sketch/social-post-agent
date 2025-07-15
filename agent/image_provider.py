@@ -1,5 +1,7 @@
 import os, abc, requests
 
+from model.image_model import ImageModel
+
 
 class ImageProvider(abc.ABC):
     @abc.abstractmethod
@@ -18,7 +20,7 @@ class UnsplashProvider(ImageProvider):
         results = body["results"]
         images = []
         for result in results:
-            images.append({"id": result["id"], "url": result["urls"]["raw"]})
+            images.append(ImageModel(result["id"], result["urls"]["raw"]))
 
         return images
 
