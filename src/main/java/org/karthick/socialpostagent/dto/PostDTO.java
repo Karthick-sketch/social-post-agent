@@ -6,8 +6,8 @@ import lombok.Setter;
 @Getter
 @Setter
 public class PostDTO {
-  String id;
-  String linkedin;
-  String instagram;
-  String twitter;
+  private String id;
+  private String linkedin;
+  private String instagram;
+  private String twitter;
 }

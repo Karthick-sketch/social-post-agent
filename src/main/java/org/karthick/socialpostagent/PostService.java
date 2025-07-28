@@ -17,7 +17,6 @@ import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
@@ -50,6 +49,10 @@ public class PostService {
       throw new RuntimeException("Post not found");
     }
     return postOptional.get();
+  }
+
+  public PostModel findPostModelById(String postId) {
+    return findPostById(postId).getUserContent();
   }
 
   // 1. Generate captions + hashtags
@@ -122,10 +125,15 @@ public class PostService {
   // 3. Schedule after human approval
   public void schedulePost(String postId, ScheduleDTO scheduleDTO) {
     Post post = findPostById(postId);
-    scheduler.schedule(post, scheduleDTO.getWhen(), post.getPlatforms());
-    post.setSchedule(scheduleDTO.getWhen());
+    scheduler.schedule(post, scheduleDTO.toString(), post.getPlatforms());
+    post.setSchedule(scheduleDTO.toString());
     post.setStatus(Status.SCHEDULED);
     postRepository.save(post);
+  }
+
+  public ScheduleDTO getSchedule(String postId) {
+    Post post = findPostById(postId);
+    return new ScheduleDTO(post.getSchedule());
   }
 
   public List<PostListDTO> postList() {
@@ -149,19 +157,5 @@ public class PostService {
     List<ImageModel> images = post.getImages();
     return new PostPreviewDTO(
         post.getId(), userContent, images, post.getSchedule(), post.getPlatforms());
-  }
-
-  public Map<Long, String> mockChat() {
-    return Map.of(
-        15L,
-"""
-```json
-{
-  "linkedin" : "LinkedIn : We're thrilled to announce Dark Mode is now live in Kalories! 🌙\\n\\nExperience reduced eye strain during late-night tracking, extended battery life on OLED devices, and a sleek modern interface. Your health journey just got more comfortable and customizable.\\n\\nTo activate : Navigate to Settings > Appearance and toggle Dark Mode. Update your app to access this highly requested feature!\\n\\n #NewFeature  "KaloriesUpdate",\
-  "instagram" : "Instagram : We're thrilled to announce Dark Mode is now live in Kalories! 🌙\\n\\nExperience reduced eye strain during late-night tracking, extended battery life on OLED devices, and a sleek modern interface. Your health journey just got more comfortable and customizable.\\n\\nTo activate : Navigate to Settings > Appearance and toggle Dark Mode. Update your app to access this highly requested feature!\\n\\n "NewFeature  "KaloriesUpdate",\
-  "twitter" : "X/Twitter : We're thrilled to announce Dark Mode is now live in Kalories! 🌙\\n\\nExperience reduced eye strain during late-night tracking, extended battery life on OLED devices, and a sleek modern interface. Your health journey just got more comfortable and customizable.\\n\\nTo activate : Navigate to Settings > Appearance and toggle Dark Mode. Update your app to access this highly requested feature!\\n\\n "NewFeature  "KaloriesUpdate",\
-  "hashtags" : ["DarkMode", "Kalories", "HealthTech", "UserExperience", "AppUpdate()
-}```
-""");
   }
 }

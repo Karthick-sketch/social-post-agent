@@ -6,6 +6,7 @@ import org.karthick.socialpostagent.dto.*;
 import org.karthick.socialpostagent.entity.Post;
 import org.karthick.socialpostagent.enums.Platform;
 import org.karthick.socialpostagent.model.ImageModel;
+import org.karthick.socialpostagent.model.PostModel;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -28,6 +29,11 @@ public class PostController {
     postService.savePost(postDTO);
   }
 
+  @GetMapping("/{postId}")
+  public PostModel findPostModelById(@PathVariable String postId) {
+    return postService.findPostModelById(postId);
+  }
+
   @GetMapping("/{postId}/suggest-images")
   public List<ImageModel> suggestImages(@PathVariable String postId, int page, int perPage)
       throws JsonProcessingException {
@@ -42,6 +48,11 @@ public class PostController {
   @GetMapping("/{postId}/platforms")
   public List<Platform> selectedPlatforms(@PathVariable String postId) {
     return postService.selectedPlatforms(postId);
+  }
+
+  @GetMapping("/{postId}/schedule")
+  public ScheduleDTO getSchedule(@PathVariable String postId) {
+    return postService.getSchedule(postId);
   }
 
   @PostMapping("/{postId}/schedule")

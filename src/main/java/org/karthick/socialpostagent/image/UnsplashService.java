@@ -29,9 +29,9 @@ public class UnsplashService implements ImageProvider {
   }
 
   @Override
-  public List<ImageModel> search(String query, int page, int per_page)
+  public List<ImageModel> search(String query, int page, int perPage)
       throws JsonProcessingException {
-    String url = getUrl(query, page, per_page);
+    String url = getUrl(query, page, perPage);
     ResponseEntity<String> response =
         restTemplate.exchange(url, HttpMethod.GET, getHttpEntity(), String.class);
     List<ImageModel> images = new ArrayList<>();
