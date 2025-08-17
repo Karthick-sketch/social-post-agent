@@ -6,11 +6,11 @@ import lombok.Setter;
 @Getter
 @Setter
 public class ImageModel {
-  long id;
-  String url;
-  boolean selected;
+  private String id;
+  private String url;
+  private boolean selected;
 
-  public ImageModel(long id, String url) {
+  public ImageModel(String id, String url) {
     this.id = id;
     this.url = url;
     this.selected = false;

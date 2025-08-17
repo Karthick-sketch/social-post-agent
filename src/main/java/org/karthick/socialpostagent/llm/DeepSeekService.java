@@ -16,11 +16,11 @@ import org.springframework.web.client.RestTemplate;
 public class DeepSeekService implements LLMProvider {
   private final RestTemplate restTemplate;
 
-  @Value("DEEPSEEK_API_KEY")
-  private String API_KEY;
-
-  @Value("MODEL")
+  @Value("${llm.deepseek.model}")
   private String MODEL;
+
+  @Value("${llm.deepseek.api-key}")
+  private String API_KEY;
 
   public DeepSeekService(RestTemplate restTemplate) {
     this.restTemplate = restTemplate;
@@ -29,6 +29,7 @@ public class DeepSeekService implements LLMProvider {
   @Override
   public String chat(ChatModel chatModel) throws JsonProcessingException {
     String url = "https://openrouter.ai/api/v1/chat/completions";
+    chatModel.setModel(MODEL);
     HttpEntity<ChatModel> entity = getHttpEntity(chatModel);
     ResponseEntity<String> response =
         restTemplate.exchange(url, HttpMethod.POST, entity, String.class);

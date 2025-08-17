@@ -1,6 +1,5 @@
 package org.karthick.socialpostagent.dto;
 
-import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;
 import org.karthick.socialpostagent.enums.Platform;
@@ -10,7 +9,6 @@ import java.util.List;
 
 @Getter
 @Setter
-@AllArgsConstructor
 public class PostListDTO {
   String id;
   String brief;

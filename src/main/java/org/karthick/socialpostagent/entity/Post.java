@@ -17,12 +17,11 @@ import java.util.List;
 public class Post {
   @Id String id;
   String brief;
-  String content;
+  PostModel content;
   List<Platform> platforms;
-  PostModel userContent;
   List<ImageModel> images;
   String schedule;
   Status status;
-  String created_at;
-  String updated_at;
+  String createdAt;
+  String updatedAt;
 }

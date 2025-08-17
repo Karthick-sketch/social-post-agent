@@ -5,7 +5,7 @@ import com.fasterxml.jackson.annotation.JsonValue;
 public enum Platform {
   LINKEDIN("LinkedIn"),
   INSTAGRAM("Instagram"),
-  TWITTER("Twitter");
+  X("X");
 
   private final String value;
 
