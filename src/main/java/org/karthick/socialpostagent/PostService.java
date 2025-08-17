@@ -78,18 +78,20 @@ public class PostService {
     postRepository.save(post);
   }
 
-  // 2. Suggest Unsplash image
+  /** 2. Suggest Unsplash image */
   public List<ImageModel> suggestImages(String postId, int page, int perPage)
       throws JsonProcessingException {
-    System.out.println("Generating Post images...");
     Post post = findPostById(postId);
-    MessageModel messageModel = new MessageModel("user", getImagePrompt(post.getContent()));
-    ChatModel chatModel = new ChatModel();
-    chatModel.setMessages(List.of(messageModel));
-    chatModel.setTemperature(0.5);
-    chatModel.setMax_tokens(20);
+    MessageModel system = new MessageModel("system", ChatPrompt.imageSystemPrompt());
+    MessageModel user =
+        new MessageModel(
+            "user",
+            ChatPrompt.imageUserPrompt(PostBuilder.postModelToJsonString(post.getContent())));
+    ChatModel chatModel = ChatModelBuilder.buildChatModel(List.of(system, user), 0.5);
+    System.out.println("Generating Post images...");
     String query = llmProvider.chat(chatModel);
-    return imageProvider.search(query, page, perPage);
+    post.setImages(imageProvider.search(query, page, perPage));
+    return postRepository.save(post).getImages();
   }
 
   public List<Platform> selectedPlatforms(String postId) {

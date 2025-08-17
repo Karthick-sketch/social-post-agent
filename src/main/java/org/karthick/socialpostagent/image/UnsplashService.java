@@ -21,7 +21,7 @@ import java.util.Map;
 public class UnsplashService implements ImageProvider {
   private final RestTemplate restTemplate;
 
-  @Value("ACCESS_KEY")
+  @Value("${image.unsplash.access-key}")
   private String ACCESS_KEY;
 
   public UnsplashService(RestTemplate restTemplate) {
@@ -38,21 +38,20 @@ public class UnsplashService implements ImageProvider {
     List<Map<String, Object>> results = getResults(response.getBody());
     for (Map<String, Object> result : results) {
       Map<String, Object> imagesUrls = (Map<String, Object>) result.get("urls");
-      images.add(
-          new ImageModel(
-              Integer.parseInt(result.get("id").toString()), imagesUrls.get("raw").toString()));
+      images.add(new ImageModel(result.get("id").toString(), imagesUrls.get("raw").toString()));
     }
     return images;
   }
 
   private String getUrl(String query, int page, int perPage) {
     return String.format(
-        "https://api.unsplash.com/search/photos?query={%s}&page={%d}&per_page={%d}",
+        "https://api.unsplash.com/search/photos?query=%s&page=%d&per_page=%d",
         query, page, perPage);
   }
 
   private HttpEntity<Void> getHttpEntity() {
     HttpHeaders headers = new HttpHeaders();
+    headers.add("Accept-Version", "v1");
     headers.add("Authorization", "Client-ID " + ACCESS_KEY);
     return new HttpEntity<>(headers);
   }
