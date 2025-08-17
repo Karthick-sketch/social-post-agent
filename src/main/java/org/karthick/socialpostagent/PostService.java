@@ -4,7 +4,9 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import lombok.AllArgsConstructor;
 import org.karthick.socialpostagent.builder.PostBuilder;
 import org.karthick.socialpostagent.dto.*;
+import org.karthick.socialpostagent.entity.LLMChatLog;
 import org.karthick.socialpostagent.entity.Post;
+import org.karthick.socialpostagent.enums.ChatType;
 import org.karthick.socialpostagent.enums.Platform;
 import org.karthick.socialpostagent.enums.Status;
 import org.karthick.socialpostagent.image.ImageProvider;
@@ -25,10 +27,15 @@ import java.util.Optional;
 @AllArgsConstructor
 public class PostService {
   private final PostRepository postRepository;
+  private final LLMChatLogRepository llmChatLogRepository;
 
   private final LLMProvider llmProvider;
   private final ImageProvider imageProvider;
   private final Scheduler scheduler;
+
+  public void logChatResponse(String response, ChatType chatType) {
+    llmChatLogRepository.save(new LLMChatLog(response, chatType));
+  }
 
   public Post findPostById(String postId) {
     Optional<Post> postOptional = postRepository.findById(postId);
@@ -52,6 +59,7 @@ public class PostService {
     ChatModel chatModel = ChatModelBuilder.buildChatModel(List.of(system, user), 0.7);
     System.out.println("Generating Post text...");
     String content = llmProvider.chat(chatModel);
+    logChatResponse(content, ChatType.CONTENT);
     return postRepository.save(
         PostBuilder.buildPost(
             generatePostDTO.getBrief(), removeObstacles(content), generatePostDTO.getPlatforms()));
@@ -90,6 +98,7 @@ public class PostService {
     ChatModel chatModel = ChatModelBuilder.buildChatModel(List.of(system, user), 0.5);
     System.out.println("Generating Post images...");
     String query = llmProvider.chat(chatModel);
+    logChatResponse(query, ChatType.IMAGE);
     post.setImages(imageProvider.search(query, page, perPage));
     return postRepository.save(post).getImages();
   }
