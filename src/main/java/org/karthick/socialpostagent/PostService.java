@@ -7,7 +7,6 @@ import org.karthick.socialpostagent.dto.*;
 import org.karthick.socialpostagent.entity.LLMChatLog;
 import org.karthick.socialpostagent.entity.Post;
 import org.karthick.socialpostagent.enums.ChatType;
-import org.karthick.socialpostagent.enums.Platform;
 import org.karthick.socialpostagent.enums.Status;
 import org.karthick.socialpostagent.image.ImageProvider;
 import org.karthick.socialpostagent.llm.ChatPrompt;
@@ -103,7 +102,7 @@ public class PostService {
     return postRepository.save(post).getImages();
   }
 
-  public List<Platform> selectedPlatforms(String postId) {
+  public List<String> selectedPlatforms(String postId) {
     Post post = findPostById(postId);
     return post.getPlatforms();
   }

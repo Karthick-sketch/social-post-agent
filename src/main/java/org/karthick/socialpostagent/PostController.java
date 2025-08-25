@@ -4,7 +4,6 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import lombok.AllArgsConstructor;
 import org.karthick.socialpostagent.dto.*;
 import org.karthick.socialpostagent.entity.Post;
-import org.karthick.socialpostagent.enums.Platform;
 import org.karthick.socialpostagent.model.ImageModel;
 import org.karthick.socialpostagent.model.PostModel;
 import org.springframework.web.bind.annotation.*;
@@ -46,7 +45,7 @@ public class PostController {
   }
 
   @GetMapping("/{postId}/platforms")
-  public List<Platform> selectedPlatforms(@PathVariable String postId) {
+  public List<String> selectedPlatforms(@PathVariable String postId) {
     return postService.selectedPlatforms(postId);
   }
 

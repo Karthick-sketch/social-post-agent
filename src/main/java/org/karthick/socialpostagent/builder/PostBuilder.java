@@ -3,7 +3,6 @@ package org.karthick.socialpostagent.builder;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.karthick.socialpostagent.entity.Post;
-import org.karthick.socialpostagent.enums.Platform;
 import org.karthick.socialpostagent.enums.Status;
 import org.karthick.socialpostagent.model.PostContentModel;
 import org.karthick.socialpostagent.model.PostModel;
@@ -11,7 +10,7 @@ import org.karthick.socialpostagent.model.PostModel;
 import java.util.List;
 
 public final class PostBuilder {
-  public static Post buildPost(String brief, String content, List<Platform> platforms)
+  public static Post buildPost(String brief, String content, List<String> platforms)
       throws JsonProcessingException {
     Post post = new Post();
     post.setBrief(brief);

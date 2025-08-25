@@ -2,7 +2,6 @@ package org.karthick.socialpostagent.dto;
 
 import lombok.Getter;
 import lombok.Setter;
-import org.karthick.socialpostagent.enums.Platform;
 import org.karthick.socialpostagent.enums.Status;
 
 import java.util.List;
@@ -14,5 +13,5 @@ public class PostListDTO {
   String brief;
   Status status;
   String schedule;
-  List<Platform> platforms;
+  List<String> platforms;
 }

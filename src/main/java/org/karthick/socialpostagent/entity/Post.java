@@ -2,7 +2,6 @@ package org.karthick.socialpostagent.entity;
 
 import lombok.Getter;
 import lombok.Setter;
-import org.karthick.socialpostagent.enums.Platform;
 import org.karthick.socialpostagent.enums.Status;
 import org.karthick.socialpostagent.model.ImageModel;
 import org.karthick.socialpostagent.model.PostModel;
@@ -18,7 +17,7 @@ public class Post {
   @Id String id;
   String brief;
   PostModel content;
-  List<Platform> platforms;
+  List<String> platforms;
   List<ImageModel> images;
   String schedule;
   Status status;

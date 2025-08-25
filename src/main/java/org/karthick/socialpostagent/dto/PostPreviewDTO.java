@@ -3,7 +3,6 @@ package org.karthick.socialpostagent.dto;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;
-import org.karthick.socialpostagent.enums.Platform;
 import org.karthick.socialpostagent.model.ImageModel;
 import org.karthick.socialpostagent.model.PostModel;
 
@@ -17,5 +16,5 @@ public class PostPreviewDTO {
   PostModel post;
   List<ImageModel> images;
   String schedule;
-  List<Platform> platforms;
+  List<String> platforms;
 }
