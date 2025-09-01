@@ -32,6 +32,10 @@ public class PostService {
   private final ImageProvider imageProvider;
   private final Scheduler scheduler;
 
+  public List<String> getSocialAccounts() throws JsonProcessingException {
+    return scheduler.getSocialAccounts();
+  }
+
   public void logChatResponse(String response, ChatType chatType) {
     llmChatLogRepository.save(new LLMChatLog(response, chatType));
   }
@@ -117,9 +121,9 @@ public class PostService {
   /** 4. Schedule after human approval */
   public void schedulePost(String postId, ScheduleDTO scheduleDTO) {
     Post post = findPostById(postId);
-    scheduler.schedule(post, scheduleDTO.toString(), post.getPlatforms());
     post.setSchedule(scheduleDTO.toString());
     post.setStatus(Status.SCHEDULED);
+    scheduler.schedule(post);
     postRepository.save(post);
   }
 

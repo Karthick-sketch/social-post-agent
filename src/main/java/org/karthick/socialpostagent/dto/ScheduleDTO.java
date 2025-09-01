@@ -8,8 +8,8 @@ import lombok.Setter;
 @Setter
 @NoArgsConstructor
 public class ScheduleDTO {
-  String date;
-  String time;
+  private String date;
+  private String time;
 
   public ScheduleDTO(String when) {
     String[] split = when.split("T");
@@ -19,6 +19,6 @@ public class ScheduleDTO {
 
   @Override
   public String toString() {
-    return String.format("%sT%s", this.date, this.time);
+    return String.format("%sT%s:00Z", this.date, this.time);
   }
 }

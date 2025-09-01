@@ -1,13 +1,14 @@
 package org.karthick.socialpostagent.scheduler;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import org.karthick.socialpostagent.entity.Post;
-import org.karthick.socialpostagent.enums.Platform;
 
 import java.util.List;
-import java.util.Map;
 
 public interface Scheduler {
-  void post(Map<String, String> post, List<Platform> platforms);
+  List<String> getSocialAccounts() throws JsonProcessingException;
 
-  void schedule(Post post, String when, List<Platform> platforms);
+  void post(Post post);
+
+  void schedule(Post post);
 }

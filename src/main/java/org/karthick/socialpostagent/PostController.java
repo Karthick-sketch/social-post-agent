@@ -17,6 +17,11 @@ import java.util.List;
 public class PostController {
   private PostService postService;
 
+  @GetMapping("/accounts")
+  public List<String> getSocialAccounts() throws JsonProcessingException {
+    return postService.getSocialAccounts();
+  }
+
   @PostMapping("/generate")
   public Post generatePost(@RequestBody GeneratePostDTO generatePostDTO)
       throws JsonProcessingException {
