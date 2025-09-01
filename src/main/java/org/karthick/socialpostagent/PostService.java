@@ -85,9 +85,8 @@ public class PostService {
     postRepository.save(post);
   }
 
-  /** 2. Suggest Unsplash image */
-  public List<ImageModel> suggestImages(String postId, int page, int perPage)
-      throws JsonProcessingException {
+  /** 2. Suggest images prompt */
+  public ImageSearchQueryDTO suggestImagesPrompt(String postId) throws JsonProcessingException {
     Post post = findPostById(postId);
     MessageModel system = new MessageModel("system", ChatPrompt.imageSystemPrompt());
     MessageModel user =
@@ -95,9 +94,17 @@ public class PostService {
             "user",
             ChatPrompt.imageUserPrompt(PostBuilder.postModelToJsonString(post.getContent())));
     ChatModel chatModel = ChatModelBuilder.buildChatModel(List.of(system, user), 0.5);
-    System.out.println("Generating Post images...");
+    System.out.println("Generating Post images prompt...");
     String query = llmProvider.chat(chatModel);
     logChatResponse(query, ChatType.IMAGE);
+    return new ImageSearchQueryDTO(query);
+  }
+
+  /** 3. Suggest Unsplash image */
+  public List<ImageModel> suggestImages(String postId, String query, int page, int perPage)
+      throws JsonProcessingException {
+    Post post = findPostById(postId);
+    System.out.println("Generating Post images...");
     post.setImages(imageProvider.search(query, page, perPage));
     return postRepository.save(post).getImages();
   }
@@ -107,7 +114,7 @@ public class PostService {
     return post.getPlatforms();
   }
 
-  // 3. Schedule after human approval
+  /** 4. Schedule after human approval */
   public void schedulePost(String postId, ScheduleDTO scheduleDTO) {
     Post post = findPostById(postId);
     scheduler.schedule(post, scheduleDTO.toString(), post.getPlatforms());

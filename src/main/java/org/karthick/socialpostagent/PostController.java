@@ -33,10 +33,16 @@ public class PostController {
     return postService.findPostModelById(postId);
   }
 
+  @GetMapping("/{postId}/suggest-images-query")
+  public ImageSearchQueryDTO suggestImages(@PathVariable String postId) throws JsonProcessingException {
+    return postService.suggestImagesPrompt(postId);
+  }
+
   @GetMapping("/{postId}/suggest-images")
-  public List<ImageModel> suggestImages(@PathVariable String postId, int page, int perPage)
+  public List<ImageModel> suggestImages(
+      @PathVariable String postId, String query, int page, int perPage)
       throws JsonProcessingException {
-    return postService.suggestImages(postId, page, perPage);
+    return postService.suggestImages(postId, query, page, perPage);
   }
 
   @PutMapping("/{postId}/save-post-images")
